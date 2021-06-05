@@ -1,0 +1,67 @@
+MySuperPy - Development Report
+
+Design decisions base:
++ (my background in modelling (often 4-layered) domain knowledge models)
++ reusable components
++ the remark in the 2nd line of the assignment invoked me go for a 'class based' implementation
++ ability to use business rules for atttribute sourcing and shop processes
++ make a supermarket program with some notion of Corporate (Social) Responsibility &
+  Sustainability. 
+
+This base turned out to be quite challenging given my current python programming skills.
+My project road took me from Amsterdam to Paris through Rome. Struggling with 
+getting things working frequently forced me to reconsider an implementation desicion: "persue 
+or give this one up?". 
+I renounced e.g. my (working!) iterable Product using a metaclass, since it introduced 
+too many complexities further down road. Instead I switchecd to a class method generating instances.
+
+Furthermore I first experienced reluctance to (required) use of CLI, CSV and "Rich".
+With experience using advanced editors to model domain knowledge, these felt like 
+'cooking on an outdoor liquid fuel stove'.
+On the otherhand I do have some basic understandance of these tools now, and see their
+(and my!) limitations. Struggling with it all tought me important new concepts, I guess.
+My main lesson coming from this assignment and it's project 'road': 
+"Don't think nice, think simple. Put this slogan on the wall, in plain sight.
+Make sure that 'nice' can come later, by getting the basics working first."
+
+Looking back, I was frequently forced me to reverse pieces of code. I got tangled up in
+'mental knots' that I had to untangle, also in the code. Due to the complexity of this
+reversing proces (+ lack of time for doing so), the code can definitely be simplified.
+Moreover, inital plans - e.g. a nice bar diagram plotting 'profit' and 'honest_profit'
+next to each other - still remain plans.
+
+Specifics to notice in my implementation:
+- product instantation
+- FIFO support = class_product  line 258 in ShopAdmin().sell()
+- advance + reverse time - class_product line 291> in ShopAdmin().advance_time()
+- honest_profit calculation and reporting
+- today is 'virtua;' today - class_product line 54> in SystemState().set_system_today()
+- command line tool / single line parsing - super.py (see manual)
+- :) working but in the end not used, in NotUsedButEWorking.py   line 40>  @classmethod getinstances
+
+Functional blocks
+main --> super.py  or   super-single.py
+storage I/O - 2-layered:
+    import1 [csv-->dict]; import2 [dict-->product-instance]
+	export1 [product-instance-->dict]; export2 [dict-->csv]
+HCI:
+	cli_tool.py
+	cli-single-line.py
+classes: 
+	class_product.py
+		SystemState
+		ShopAdmin
+		Product
+	class_reports.py
+		Report
+		Fixed_date_reports
+		Time_range_reports
+External modules used
+	argparse
+	datetime
+	pandas
+	weakref
+	calendar
+	prettytable
+
+Anneke, 2021-06-05

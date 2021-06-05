@@ -1,0 +1,67 @@
+
+SUPER.PY User Manual
+
+SUPER has two different options to enter commands:
+1. single line command line parsing		<--  	    
+	RUN  python super-single.py
+	uses cli_single_line.py
+2. command line tool - with one continuous user input loop 
+	RUN  python super.py
+	uses cli_tool.py
+super.py and super-single.py are both replacements of 'main.py'
+They both contain (the same) winc-id and assignment-name.
+
+HOW TO SWITCH COMMAND MODE ?
+This is the command-line-tool version, with one user-input-loop.
+Switch to single-line-input-mode, by using super2.py.
+
+                          *****
+Welcome in the Supermarket that is very simple and yet offers you a nice
+range of product. Beneath you find a list of commands you can type. They
+are indicated as [string-to-type]; leave out the brackets when used.
+[-h] with this  you can type [-h] to ask for help.
+                          *****
+
+               **** ALL COMMANDS IN BRIEF ****
+exit -->  quit supermarket
+today = simulated 'today' coming from file superpy_date.txt
+REPORTS Command formats
+*  report product_range - what products can be bought?
+*  report inventory <time-indicator>
+      <time_indicator> is one of: --now / --yesterday / --date YYYY-MM-DD
+report with time-range <report_type> --<time_indicator>
+       <report_types> is one of: revenue / profit / honest_profit
+       <time_indicator> is one of:
+               --now
+               --yesterday
+               --date YYYY-MM) = month
+               --date YYYY-MM-DD = specific day
+       e.g.
+  *    report revenue --now
+  *    report profit --date 2020-10
+  *    report honest_profit --yesterday
+SHOPPING ACTIONS Command formats
+  buy  --product-name <> --expiration-date YYYY-MM-DD --price <>
+  sell --product-name <> --price <>
+        e.g.
+ *      buy --product-name orange --expiration-date 2022-01-01 --price 1
+ *      buy --product-name cola --expiration-date 2022-01-01 --price 1.65
+ *      sell --product-name peas --price 0.8
+
+Database / csv-files
+One file keeps track of the daily shop administration:
+product_data.csv
+	The file contains all the actual product-instance argument values, and 
+	is constantly updated.
+	NB : this file should always be in place !
+product_range.csv
+	The product_range database is stored in a seperate file: product_range.csv
+	"report product_range" command gives the actual product range 
+	that the store offers, coming from this file.
+	NB : this file should always be in place !
+inventory.csv contains the last export of an inventory report.
+
+Txt-files
+superpy_date.txt - contains the reference date for 'today'
+manual.txt - this manual
+report.txt - the project report
