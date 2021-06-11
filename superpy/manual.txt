@@ -1,5 +1,5 @@
 
-SUPER.PY User Manual
+SUPER.PY User Manual - version 11-06-2021
 
 SUPER has two different options to enter commands:
 1. single line command line parsing		<--  	    
@@ -52,16 +52,78 @@ Database / csv-files
 One file keeps track of the daily shop administration:
 product_data.csv
 	The file contains all the actual product-instance argument values, and 
-	is constantly updated.
+	is constantly updated. All buying, selling, expiration and discount is logged here.
 	NB : this file should always be in place !
 product_range.csv
 	The product_range database is stored in a seperate file: product_range.csv
 	"report product_range" command gives the actual product range 
 	that the store offers, coming from this file.
 	NB : this file should always be in place !
-inventory.csv contains the last export of an inventory report.
+Exports to csv
+The inventory.csv contains the last export of an Inventory Report. The export is only generated 
+when the user requested an Inventory Report for the actual inventory 
+(with flag --now).
+When an Revenue Report is generated - given the date range the user has specified - the user has  
+the option to export the sellings in this period to csv. File name will be YYYY-MM(-DD)-sold.csv
 
 Txt-files
 superpy_date.txt - contains the reference date for 'today'
 manual.txt - this manual
 report.txt - the project report
+
+
+
+          **** GOOD TO KNOW ABOUT SUPERPY and WHAT'S GOING ON BEHIND THE SCENES ****
+
+***At the start***
+Make sure the date in the superpy_date.txt is the date you want to start with,.
+Furthermore: for a 'fresh' start, make sure that product_data.csv has only a header row 
+and nothing else in it. All buying, selling, expiration and discount is logged here.
+
+***Time manipulation***
+The date of 'today' is stored in superpy_date.txt and is adjusted when the advance-time function is
+used.
+Reversing time can adjust (undo) expirations and sellings. Buying-data is not removed; however,
+products with 'future buying dates' are not 'in stock' and therefor not in the inventory on a day that 
+lies before their buying date.
+
+***Revenue, Profit and True Profit - discounts and footprints***
+Time range for these three reports can either be a specific day (--now, --yesterday, --date YYYY-MM-DD)
+or a specific month (--date YYYY-MM).
+  ***Revenue
+Revenue is based on the total sum of all the selling prices, of the products whose selling date falls within
+the specified time range. When the selling date coincides with the expiration date, the selling price is 
+65% of the price that is specified in the sell command of the user .
+The Profit and Honest Profit reports can be generated for a specific day or an specific month.
+  ***Profit
+Profit is based on Revenue - Costs, where Costs is the total sum of the buying prices of the products whose selling price
+contributed to the revenue.
+  ***Honest Profit
+Honest Profit is based on the same system. Only here the costs are so called ´True Costs'. 
+True Costs take into account not only the buying price, but also the 'social and environmental' footprint.
+The footprint factor is specified for each product in the product_range.csv, and lies between 1-10.
+Using the factor, the True Costs are derived with this algorithm:
+true_costs = buying_price * (1 + footprint_factor/10).
+E.g.: buying price = 2.00; footprint factor = 4 --> true costs = 2.80
+
+
+***An example scenario for profit and honest_profit***
+today (in superpy_date) = 2021-06-11
+* buy --product-name milk --expiration-date 2021-06-13 --price 1
+* buy --product-name milk --expiration-date 2021-06-14 --price 1
+* buy --product-name cola --expiration-date 2021-07-01 --price 1.50
+* advance-time 2
+--> (today is now 2021-06-13)
+* sell --product-name milk --price 2
+	fifo + discount factor (for selling on day of expiration) -->
+	milk is sold for (2 * discount=0.65) => 1.30
+* sell --product-name cola --price 3
+* report revenue --now
+--> 1.30 + 3.00 => 4.30
+* report profit --now
+--> [Revenue-Costs] => [4.30 - (1 + 1.50)] => 1.80
+* report honest_profit --now
+--> [Revenue-True_Costs] => [4.30 - (1.4 + 2.25)] => 0.65
+	where
+	footprint factor milk = 4 --> true cost milk = 1*1.4 = 1.4
+	footprint factor cola = 5 --> true cost cola = 1.50*1.5 = 2.25

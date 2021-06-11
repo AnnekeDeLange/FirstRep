@@ -228,16 +228,43 @@ class Time_range_report():
         if type(report_period) != list:
             prices = [x for x in table if (x.sell_price
                                            and x.sell_date == report_period)]
+            sells_in_period = [x for x in table
+                               if (x.sell_date == report_period)]
         else:
             prices = [x for x in table if (x.sell_price
                                            and x.sell_date in report_period)]
+            sells_in_period = [x for x in table
+                               if (x.sell_date in report_period)]
+        # stuff to export
+        export_sells = input("Export the sellings for this period? y/n \n")
+        if export_sells == 'y':
+            sells_to_export = []
+            for prod in sells_in_period:
+                dict_to_append = {'Product name': prod.name,
+                                  'Sell date': prod.sell_date,
+                                  'Sell price': prod.sell_price,
+                                  'Discount factor': prod.discount_factor}
+                sells_to_export.append(dict_to_append)
+            if self.date_str == 'now':
+                rep_date_str = SystemState().today
+            elif self.date_str == 'yesterday':
+                rep_date_str = SystemState().today + datetime.timedelta(-1)
+            else:
+                rep_date_str = self.date_str[5:]
+            output_file = f"{rep_date_str}-sold.csv"
+            exp_fields = ['Product name', 'Sell date', 'Sell price',
+                          'Discount factor']
+            Report().export_rep_to_csv(exp_fields,
+                                       output_file, sells_to_export)
+            print("Sellings for this period are exported to ", output_file)
+        # end stuff to export
         revenue_raw = sum([float(x.sell_price)
                            for x in prices if float(x.sell_price)])
         revenue = '{:.2f}'.format(revenue_raw)
         return revenue
 
     def get_profit(self):
-        """Returns sum_total of sell_prices when sell_dates in timeperiod."""
+        """Total(sell_prices - buy_prices), when sell_dates in timeperiod."""
         report_period = self.date_req_to_report_period(self.date_str)
         table = self.inventory_list
         total_revenue = float(self.get_revenue())

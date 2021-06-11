@@ -127,7 +127,8 @@ class SystemState():
         # show = product_dictrecord.items()
         pd = product_dictrecord
         shop_today = SystemState().today
-        p = Product(pd.pop('prod_name'), pd.pop('exp_date'),
+        p = Product(pd.pop('prod_name'),
+                    SystemState().proper_date(pd.pop('exp_date')),
                     pd.pop('buy_price'))
         p_list = p.product_list
         # different instantiation for: new buys or imported records
@@ -171,7 +172,7 @@ class SystemState():
         else:
             return inventory_list
 
-    def update_csv(file_name, updated_dicts):
+    def update_csv(self, updated_dicts):
         fields = ['id', 'prod_name', 'prod_group', 'buy_date',
                   'exp_date', 'buy_price', 'sold', 'sell_date',
                   'sell_price', 'expired', 'discount_factor',
@@ -266,6 +267,7 @@ class ShopAdmin():
             p_to_sell.sold = True
             calc_sell_price = (float(list_price) * p_to_sell.discount_factor)
             p_to_sell.sell_price = SystemState().proper_price(calc_sell_price)
+            p_to_sell.sell_date = SystemState().today
         else:
             p_to_sell.sold = True
             p_to_sell.sell_price = SystemState().proper_price(list_price)
