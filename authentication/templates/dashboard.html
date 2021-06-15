@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Welcome to the Dashboard.</p>
+<p class="largeText boldText">Hello {{name}}!</p>
+<ul>This is your personal dashboard.</ul>
+
+{% if name == 'Alice' %}
+<ul>
+    Alice, if you like to enhance your profile,
+    you can upload some pictures.
+</ul>
+{% elif name == 'Bob' %}
+<ul>
+    Bob, you already uploaded some nice pictures.
+    Maybe you can add some personal notes on why
+    you want to use this dashboard.
+</ul>
+{% else %}
+How nice that you are taking a look at this Dashboard.
+{% endif %}
+
+<p class="largeText boldText">We used some Jinja to personalise things.</p>
+{% endblock content %}

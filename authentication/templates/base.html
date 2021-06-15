@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Use url_for to link a stylesheet named `style.css` here. -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+
+    <!-- Use Jinja to put a title here. -->
+    <title>{{ title }}</title>
+    <!-- flash block -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <p class=flashes><strong>
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </strong>
+    </p>
+    {% endif %}
+    {% endwith %}
+    <!-- end flash block -->
+
+</head>
+
+<body>
+    <!-- <h1>Hi!</h1> -->
+    <h3>Navigation</h3>
+    <ul>
+        <li><a href="/home">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/logout">Logout</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/lon">League of Nations</a></li>
+    </ul>
+    {% block content %}
+    {% endblock %}
+</body>
+
+</html>
