@@ -177,35 +177,12 @@ def vegetarian_dishes() -> List[models.Dish]:
     Query the database to return a list of dishes that contain only
     vegetarian ingredients.
     """
-    # veggie_ings = lijst maken
-    # veg_ingredients = (models.Ingredient
-    #                    .select()
-    #                    .where(models.Ingredient.is_vegetarian == 1))
-    # dishes = (models.Dish
-    #           .select()
-    #           .join(models.DishIngredient)
-    #         #   .group_by(models.Dish.id)
-    #           )
-    # # stuk hieronder opgestuurd op Slack
-    # veggie_dishes = [dish for dish
-    #                  in models.Dish.select()
-    #                  if all([i.is_vegetarian
-    #                          for i in dish.ingredients])
-    #                 #  if all([i for i in dish.ingredients
-    #                 #          if i.is_vegetarian == 1])
-    #                 #  if all([i for i in dish.ingredients
-    #                 #          if i.is_vegetarian])
-    #                  ]
-    # return veggie_dishes
-    return [dish for dish
-            in models.Dish.select()
-            # if all([i for i in dish.ingredients
-            #         if i.is_vegetarian])
-            if all([i for i in dish.ingredients
-                    if i.is_vegetarian])
-            ]
-
-
+    veggie_dishes = [dish for dish
+                     in models.Dish.select()
+                     if all([i.is_vegetarian
+                             for i in dish.ingredients])
+                     ]
+    return veggie_dishes
 #  # END MY VERSION
 
 
@@ -267,20 +244,25 @@ def dinner_date_possible() -> List[models.Restaurant]:
     #                .select()
     #                .where(models.Ingredient.is_vegan == 1)
     #                )
-    r_open = (models.Restaurant
-              .select()
-              #  .join(models.Dish, on=(models.Dish.served_at ==
-              #                         models.Restaurant.id))
-              #  .join(vegan_ingrs, on=(models.Dish.ingredients == vegan_ingrs))
-              .where((models.Restaurant.opening_time.hour <= '19')
-                     & (models.Restaurant.opening_time.minute <= '00')
-                     & (models.Restaurant.closing_time.hour >= '20')
-                     & (models.Restaurant.closing_time.minute >= '30')
-                     )
-              )
-    print("ja restaurant met goede openingstijden", r_open)
-    vegan_r_open = 0
-    return vegan_r_open
+    # vegan_dishes = [dish for dish
+    #                 in models.Dish.select()
+    #                 if all([i.is_vegen
+    #                         for i in dish.ingredients])]
+    rests = [rest for rest in models.Restaurant
+             .select()
+             .where((models.Restaurant.opening_time.hour <= 19)
+                    & (models.Restaurant.opening_time.minute <= 00)
+                    & (models.Restaurant.closing_time.hour >= 20)
+                    & (models.Restaurant.closing_time.minute >= 30)
+                    )
+             if len([dish for dish
+                     in models.Dish
+                     .select()
+                     .where(models.Dish.served_at == rest.id)
+                     if all([i.is_vegan for i in dish.ingredients])
+                     ]) > 0
+             ]
+    return rests
 #  # MY VERSION
 
 
@@ -323,13 +305,13 @@ def add_dish_to_menu() -> models.Dish:
                   'is_glutenfree': False})
     rice_key[0].save()
     # print(rice_key)
-    garlic_key = models.Ingredient.get_or_create(
-        name='garlic',
-        defaults={'is_vegetarian': True,
-                  'is_vegan': True,
+    shrimps_key = models.Ingredient.get_or_create(
+        name='shrimps',
+        defaults={'is_vegetarian': False,
+                  'is_vegan': False,
                   'is_glutenfree': True})
-    garlic_key[0].save()
-    # print(garlic_key)
+    shrimps_key[0].save()
+    # print(shrimps_key)
     # get a restaurant to serve dish (1st rest is my_rest)
     a_rest = (models.Restaurant .select() .limit(1))
     # CREATE NEW DISH
@@ -345,7 +327,7 @@ def add_dish_to_menu() -> models.Dish:
         models.Ingredient.get(models.Ingredient.name == 'onion'),
         models.Ingredient.get(models.Ingredient.name == 'eggs'),
         models.Ingredient.get(models.Ingredient.name == 'rice'),
-        models.Ingredient.get(models.Ingredient.name == 'garlic')
+        models.Ingredient.get(models.Ingredient.name == 'shrimps')
         ])
     # ingres = new_dish.ingredients
     # for i in ingres:
@@ -395,4 +377,4 @@ cheapest_dish()
 
 # add_dish_to_menu()
 
-dinner_date_possible()
+# dinner_date_possible()
