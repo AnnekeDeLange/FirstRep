@@ -1,0 +1,33 @@
+
+db = peewee.SqliteDatabase(":memory:")
+
+Tables
+
+Ingredients
+name = Charfield
+is_vegetarian = BooleanField
+is_vegan = > BooleanField
+is_glutenfree = BooleanField
+
+Restaurant
+name = Charfield
+rating = >integer
+open_since = > Datefield
+opening_time = >TimeField
+closing_time = TimeField
+
+Dish
+name = >Charfield
+served_at = ForeignKeyField(Restaurant)
+price_in_cents = >Integer
+ingredients = peewee.ManyToManyField(Ingredient)
+
+Rating
+restaurant = ForeignKeyField(Restaurant)
+rating = > Integer?
+comment = Charfield
+
+
+DishIngredient = Dish.ingredients.get_through_model()
+
+
