@@ -7,22 +7,7 @@ import my_helpers
 from peewee import fn
 
 
-# def connect_to_database():
-#     models.db.connect()
-
-
-"""Parts of main are :
-1. INIT - fill database with initial content.
-2. REQUIRED FUNCTION DEFINITIONS - Functions required for the assignment.
-3. CREATE DATABASE TABLES ( + optional fill DaTABASE)
-    steps 1 and 2
-4. TESTING SCENARIO's - optional scenario for each function)
-    steps 3 to 9
-   - Testing scenario for each required function, specifying example
-     function calls, that can be un-commented to activate."""
-
-
-# # PART 1 INIT - initialise database and generate some content
+# INIT - initialise database and generate some content
 
 def create_some_users_and_add_their_products_to_catalog():
     my_helpers.make_some_user_instances(['Annie', 'Bob', 'Carla',
@@ -119,10 +104,8 @@ def create_some_users_and_add_their_products_to_catalog():
          'tags': ['table', 'office', 'furniture', 'plywood']
          })
 
-# # END PART 1 INIT ------------------------------------------------------
+# END INIT -----------------------------------------------
 
-
-# # PART 2 REQUIRED FUNCTIONS DEFINITIONS
 
 def search_product(term):
     '''Case-insensitive search for term in field product.name.'''
@@ -268,160 +251,150 @@ def remove_product(product_id):
         result = "The product and it's links to tags are removed."
     return result
 
-# # END PART 2 REQUIRED FUNCTIONS DEFINITIONS ---------------------------
 
+if __name__ == '__main__':
 
-# # PART 3 CREATE DATABASE TABLES and fill database with content
+    print("CREATE TABLES - First the database tables are created")
+    models.create_tables()
+    print("FILL DATABASE - and the database is filled with some content.")
+    create_some_users_and_add_their_products_to_catalog()
+    print("The users are:")
+    my_helpers.show_all_users()
+    print("And the products in the database are:")
+    my_helpers.show_all_products()
 
-# # STEP 1 - CREATE database tables
-models.create_tables()
+    print("\n")
+    print("""SEARCH
+          Search on the term 'design' shows products with both
+          upper case and lower case in the name """)
+    searchresult = search_product('design')
+    print("Function call: search_product('design')")
+    for p in searchresult:
+        print("search result is", p.id, p.name)
+    print("""SEARCH
+            Searching on 'metal' shows also that search also
+            covers the description field.""")
+    print("Function call: search_product('metal')")
+    searchresult = search_product('metal')
+    for p in searchresult:
+        print("searchresult is", p.id, p.name)
 
+    print("\n")
+    print("""ADD_PRODUCT_TO_CATALOG -
+             Add another product to the catalog, for user with id=6.""")
+    print("""Function call: add_product_to_catalog(
+                6,
+                {'name': 'Oil painting',
+                'unit_price': '275.00',
+                'instock': 1,
+                'description': "Mountain landscape, oil on canvas.",
+                'tags': ['art', 'painting', 'oil']
+                })""")
+    add_product_to_catalog(
+        6,
+        {'name': 'Oil painting',
+         'unit_price': '275.00',
+         'instock': 1,
+         'description': "Mountain landscape, oil on canvas.",
+         'tags': ['art', 'painting', 'oil']
+         })
+    print("Function call: my_helpers.show_all_products()")
+    my_helpers.show_all_products()
 
-# # STEP 2 - FILL database with content
-# create_some_users_and_add_their_products_to_catalog()
+    print("\n")
+    print("""UPDATE STOCK -
+             Update the stock of this new product (product_id=11).
+             Old quantity was 1, new quantity will be 3.""")
+    print("Function call: update_stock(11, 3)")
+    update_stock(11, 3)
+    print("Function call: my_helpers.show_all_products()")
+    my_helpers.show_all_products()
 
-# my_helpers.show_all_users()
-# my_helpers.show_all_products()
+    print("\n")
+    print("""LIST_USER_PRODUCTS""")
+    print("Function call: list_user_products(6)")
+    up_list = list_user_products(6)
+    user_to_show = models.User.get_by_id(6)
+    print("User", user_to_show.id, "is", user_to_show.full_name)
+    # print to test result
+    if up_list == []:
+        print("This user has no products yet.")
+    else:
+        for p in up_list:
+            print("Products of this user are:", p.id, p.name)
 
-# # END PART 3 CREATE DATABASE TABLES and fill database with content ------
+    print("\n")
+    print("""LIST_PRODUCTS_PER_TAG""")
+    print("First, show all tags in the database at this moment.")
+    print("Function call: my_helpers.show_all_tags()")
+    my_helpers.show_all_tags()
+    print("""And then show the products linked to specified tag.""")
+    print("Function call: list_products_per_tag(4)")
+    taglist = list_products_per_tag(4)
+    tag_to_show = models.Tag.get_by_id(4)
+    print("Label of tag with id", tag_to_show.id, "is '",
+          tag_to_show.label, "'.")
+    if taglist == ["This tag does not exist (anymore)."]:
+        print(taglist)
+    elif taglist == ["This tag is not linked to a product."]:
+        print(taglist)
+    else:
+        print("List of products the tag is linked to:")
+        for p in taglist:
+            prod = models.Product.get(models.Product.id == p)
+            print("Product", prod.id, prod.name)
 
+    print("\n")
+    print("""REMOVE_PRODUCT""")
+    print("Function call: remove_product(4)")
+    prod_to_remove = models.Product.get_or_none(models.Product.id == 4)
+    result_of_removal = remove_product(4)
+    print(result_of_removal)
+    if prod_to_remove is not None:
+        print("All products after removal of", prod_to_remove.id,
+              prod_to_remove.name, "are updated.")
+        print("Function call: my_helpers.show_all_products()")
+        my_helpers.show_all_products()
+        print("The list with  products-tag pairs after removal of",
+              prod_to_remove.id, prod_to_remove.name, "is also updated.")
+        print("Function call: my_helpers.show_ProductTag_rows()")
+        print("Pairs in this table are shown as <product.id> <tag,id>.")
+        my_helpers.show_ProductTag_rows()
 
-# # PATRT 4 TEST SCENARIO FOR testing REQUIRED Function for ASSIGNMENT
-# # activate function calls Step-by-step as testing script.
-# # To activate the calls uncommenting the lines with a single # sign.
+    print("\n")
+    print("""PURCHASE_PRODUCT""")
+    print("""Function format is:
+          purchase_product(product_id, buyer_id, quantity)""")
+    print("1. The purchase of product by the owner is prevented:")
+    print("Function call: transaction = purchase_product(5, 3, 2)")
+    transaction = purchase_product(5, 3, 2)
 
-# # TEST SCENARIO FOR testing REQUIRED Functions for ASSIGNMENT
+    print("\n")
+    print("""2. Also, a purchase quantity that exceeds the quantity is instock,
+             is prevented.""")
+    print("Function call: transaction = purchase_product(5, 4, 9)")
+    transaction = purchase_product(5, 4, 9)
 
-# # STEP 3 - test SEARCH function
-
-# # 3.1 check case insensitivity
-# searchresult = search_product('design')
-# for p in searchresult:
-#     print("searchresult is", p.id, p.name)
-
-# # 3.2 check search in description
-# searchresult = search_product('metal')
-# for p in searchresult:
-#     print("searchresult is", p.id, p.name)
-
-
-# # STEP 4 - test ADD_PRODUCT_TO_CATALOG function
-# # SINGLE EXAMPLE CALL - user with id=6 must exist
-# add_product_to_catalog(
-#     6,
-#     {'name': 'Oil painting',
-#      'unit_price': '275.00',
-#      'instock': 1,
-#      'description': "Mountain landscape, oil on canvas.",
-#      'tags': ['art', 'painting', 'oil']
-#      })
-# my_helpers.show_all_products()
-
-
-# # STEP 5 - test UPDATE_STOCK function
-# # format - update_stock(product_id, new_quantity)
-# # EXAMPLE CALL - product with id=3 must exist
-# my_helpers.show_all_products()
-# update_stock(3, 4)
-# my_helpers.show_all_products()
-
-
-# # STEP 6 - test LIST_USER_PRODUCTS
-# # EXAMPLE CALL - user with id=3 must exist
-# my_helpers.show_all_products()
-# up_list = list_user_products(2)
-# user_to_show = models.User.get_by_id(2)
-# print("User", user_to_show.id, "is", user_to_show.full_name)
-# # print to test result
-# if up_list == []:
-#     print("This user has no products yet.")
-# else:
-#     for p in up_list:
-#         print("Products are:", p.id, p.name)
-
-
-# # STEP 7 - test LIST_PRODUCTS_PER_TAG
-# # EXAMPLE CALL - tag with id=3 exists
-
-# # STEP 7.1 - show all tags
-# my_helpers.show_all_tags()
-
-# # STEP 7.2 - EXAMPLE CALL to show products of tag with id=4
-# taglist = list_products_per_tag(4)
-#  # show result
-# tag_to_show = models.Tag.get_by_id(4)
-# print("Label of tag with id", tag_to_show.id, "is", tag_to_show.label)
-# if taglist == ["This tag does not exist (anymore)."]:
-#     print(taglist)
-# elif taglist == ["This tag is not linked to a product."]:
-#     print(taglist)
-# else:
-#     for p in taglist:
-#         prod = models.Product.get(models.Product.id == p)
-#         print("tag is linked to:", prod.id, prod.name)
-
-
-# # STEP 8 - test REMOVE_PRODUCT
-# # EXAMPLE CALL for REMOVE_PRODUCT - product with id=1 must exist
-# my_helpers.show_all_products()
-# prod_to_remove = models.Product.get_by_id(4)
-# result_of_removal = remove_product(4)
-# print(result_of_removal)
-# print("All products after removal of", prod_to_remove.id,
-#       prod_to_remove.name)
-# my_helpers.show_all_products()
-# print("All products-tag pairs after removal of", prod_to_remove.id,
-#       prod_to_remove.name)
-# my_helpers.show_ProductTag_rows()
-
-
-# # STEP 9 - test PURCHASE_PRODUCT
-# # EXAMPLE CALL - product with id=5 and buyer_id with id=4 must exist
-# #  format - purchase_product(product_id, buyer_id, quantity)
-
-# # STEP 9.1 pruchase of a product by the owner is prevented
-# transaction = purchase_product(5, 3, 2)
-# if transaction is not None:
-#     print("transaction", transaction.date, transaction.product_ordered.name,
-#           "in stock now", transaction.product_ordered.instock,
-#           "owner of product", transaction.product_ordered.owner.full_name,
-#           transaction.total_price,
-#           "buyer", transaction.buyer.full_name)
-
-# # STEP 9.2 purchase quantity that exceeds quantity is instock, is prevented
-# transaction = purchase_product(5, 4, 9)
-# if transaction is not None:
-#     print("transaction", transaction.date, transaction.product_ordered.name,
-#           "in stock now", transaction.product_ordered.instock,
-#           "owner of product", transaction.product_ordered.owner.full_name,
-#           transaction.total_price,
-#           "buyer", transaction.buyer.full_name)
-
-# # # STEP 9.3 test of correct purchase and updating of quantity in stock
-# transaction = purchase_product(6, 2, 1)
-# if transaction is not None:
-#     print("The transaction for this purchase:")
-#     print("+ transaction", transaction.date)
-#     print("+ product ordered:", transaction.product_ordered.name)
-#     print("+ number_ordered:", transaction.quantity)
-#     print("+ unit_price of product is",
-#           transaction.product_ordered.unit_price)
-#     print("+ seller is", transaction.product_ordered.owner.full_name)
-#     print("+ id of seller is:", transaction.product_ordered.owner.id)
-#     print("+ seller's bankaccount is:",
-#           transaction.product_ordered.owner.bank_account)
-#     print("+ total transaction price is €", transaction.total_price)
-#     print("+ buyer", transaction.buyer.full_name)
-#     print("+ id of buyer is:", transaction.buyer.id)
-#     print("+ left in stock after transaction",
-#           transaction.product_ordered.instock)
-
-
-# # function calls for basic reporting functions
-# my_helpers.show_all_products()
-# my_helpers.show_all_users()
-# my_helpers.show_all_products()
-# my_helpers.show_all_tags()
-# my_helpers.show_ProductTag_rows()
-
-# # END PATRT 4 TEST SCENARIO FOR testing REQUIRED Function for ASSIGNMENT
+    print("\n")
+    print("""3. Finally, a proper purchase creates
+          a new transaction record.""")
+    print("Function call: purchase_product(6, 4, 2)")
+    transaction = purchase_product(6, 4, 2)
+    if transaction is not None:
+        print("""The transaction record makes the following information
+              about the transaction available:""")
+        print("+ transaction id:", transaction.id)
+        print("+ transaction date:", transaction.date)
+        print("+ product ordered:", transaction.product_ordered.name)
+        print("+ quantity (ordered):", transaction.quantity)
+        print("+ total transaction price is €", transaction.total_price)
+        print("+ unit_price of product is",
+              transaction.product_ordered.unit_price)
+        print("+ seller is", transaction.product_ordered.owner.full_name)
+        print("+ id of seller is:", transaction.product_ordered.owner.id)
+        print("+ seller's bankaccount is:",
+              transaction.product_ordered.owner.bank_account)
+        print("+ buyer", transaction.buyer.full_name)
+        print("+ id of buyer is:", transaction.buyer.id)
+        print("+ left in stock after transaction",
+              transaction.product_ordered.instock)

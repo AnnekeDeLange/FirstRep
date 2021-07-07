@@ -2,14 +2,9 @@
 import peewee
 import datetime
 from functools import partial
-from peewee import Model
-from peewee import CharField
-from peewee import TextField
-from peewee import DecimalField
-from peewee import IntegerField
-from peewee import DateField
-from peewee import ForeignKeyField
-from peewee import ManyToManyField
+from peewee import (Model, CharField, TextField, DecimalField,
+                    IntegerField, DateField, ForeignKeyField,
+                    ManyToManyField)
 
 
 db = peewee.SqliteDatabase("betsywebshop.db")
@@ -18,12 +13,12 @@ MoneyField = partial(DecimalField, decimal_places=2)
 
 
 class User(Model):
-    full_name = CharField(unique=True)
+    full_name = CharField()
     street_and_no = CharField()
     postal_code = CharField()
     city = CharField()
     country = CharField()
-    bank_account = TextField()
+    bank_account = CharField()
 
     class Meta:
         database = db
@@ -70,6 +65,3 @@ ProductTag = Product.tags.get_through_model()
 def create_tables():
     with db:
         db.create_tables([User, Tag, Product, Transaction, ProductTag])
-
-
-# create_tables()
